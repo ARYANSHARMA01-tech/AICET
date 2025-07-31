@@ -17,28 +17,26 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- Model Loading (Updated to skip the problematic model) ---
+# --- Model Loading (Re-enabling all models) ---
 @st.cache_resource
 def load_all_models():
     """
     Load all h5 models from the project directory.
-    Skips the model known to cause deployment errors.
+    Gracefully handles errors if a model fails to load.
     """
     models = {}
-    # We will only load the models that we know are working
+    # Re-enabling all three models
     model_files = {
         "Basic CNN": "basic_cnn_tree_species.h5",
+        "Main Model (EfficientNet)": "tree_species_model.h5",
         "Improved CNN": "improved_cnn_model.h5"
-        # "Main Model (EfficientNet)": "tree_species_model.h5", # Temporarily disabled
     }
-    
-    # Add a warning that one model is disabled
-    st.info("Note: The 'Main Model (EfficientNet)' is temporarily disabled due to a loading error.")
 
     for name, file_path in model_files.items():
         try:
             models[name] = load_model(file_path)
         except Exception as e:
+            # If a model fails, show a warning but don't crash the app
             st.warning(f"Could not load model '{name}' from {file_path}. Error: {e}")
             print(f"Failed to load {name}: {e}")
             
